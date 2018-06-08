@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.program.swapfavourites" name="Swap Favourites" version="0.1.0" provider-name="doko">
+<addon id="plugin.program.orderfavourites" name="Order Favourites" version="1.0.0" provider-name="doko">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
   </requires>
@@ -8,7 +8,7 @@
   </extension>
   <extension point="xbmc.addon.metadata">
     <summary lang="en"></summary>
-    <description lang="en">Lets you swap the places of two entries in your Favourites.[CR]Use this to organize your Favourites.[CR][CR]- Use SAVE to commit your changes.[CR]- Use RESET to reload the favourites file and start over.</description>
+    <description lang="en">Lets you reorder the entries in your Favourites.[CR]Use this to organize your Favourites.[CR][CR]- Use SAVE to commit your changes.[CR]- Use RESET to reload the favourites file and start over.</description>
     <disclaimer lang="en"></disclaimer>
     <platform>all</platform>
   </extension>

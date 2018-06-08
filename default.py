@@ -10,7 +10,9 @@ __handle__ = int(sys.argv[1])
 
 FAVOURITES_PATH = xbmc.translatePath('special://userdata/%s' % 'favourites.xml').decode('utf-8')
 THUMBNAILS_PATH = xbmc.translatePath('special://thumbnails').decode('utf-8')
-FAVS_PROP = 'swapfavourites.favourites'
+
+FAVS_PROP = 'orderfavourites.favourites'
+PAD_PROP = 'orderfavourites.padding'
 
 #===================================================================================		
     
@@ -20,46 +22,47 @@ def viewFavourites(params):
     
     if not params:
         params = { }
-        
     indexFrom = int( params.get('from', [-1])[0] )
     indexTo = int( params.get('to', [-1])[0] )
     
     favs = getWindowProperty(FAVS_PROP)
     if not favs:
         favs = loadFavs()
-        
+    
     listItems = [ ]
     for index, f in enumerate(favs):
-        li = xbmcgui.ListItem( f['name'] )
+        li = xbmcgui.ListItem( '[COLOR yellow][B]'+f['name']+'[/B][/COLOR]' if index == indexFrom else f['name'] )
         cache = f['cache']
         li.setArt( { 'poster': cache, 'icon': cache } )
-      
-        if index == indexFrom:
-            urlParams = {'from':str(index), 'to':'-1', 'reroute':1}
-            li.setLabel( '%s%s%s' % ('[COLOR yellow][B]', li.getLabel(), '[/B][/COLOR]') )
-        elif indexFrom != -1:
-            urlParams = {'from':str(indexFrom), 'to':str(index), 'swap':1}
+
+        if indexFrom != -1:
+            urlParams = {'from': indexFrom, 'to': index, 'insert': 1}
         else:
-            urlParams = {'from':str(index), 'to':'-1', 'reroute':1}
+            urlParams = {'from': index, 'to': -1, 'reroute': 1}
         url = buildUrl(urlParams)
         listItems.append( (url, li, False) )
     
     liSave = xbmcgui.ListItem('[COLOR greenyellow]SAVE[/COLOR]')
     saveUrl = buildUrl( {'save':1} )
-    liSave = (saveUrl, liSave, False)
-    listItems.append( liSave )
+    listItems.append( (saveUrl, liSave, False) )
     
     liReset = xbmcgui.ListItem('[COLOR hotpink]RESET[/COLOR]')
     resetUrl = buildUrl( {'reset':1} )
-    liReset = (resetUrl, liReset, False)
-    listItems.append( liReset )
+    listItems.append( (resetUrl, liReset, False) )
     
     # Add dummy items as padding so the grid shows 4 per row like the Favourites screen.
-    alignedItems = [ ('', xbmcgui.ListItem(''), False) for n in range(3) ] + listItems
+    if getWindowProperty(PAD_PROP) > 1:
+        alignedItems = [ ('', xbmcgui.ListItem(''), False) for n in range(3) ] + listItems
+    else:
+        alignedItems = listItems # Custom skins, we can't safely use padding items.
 
-    xbmc.executebuiltin('Container.SetViewMode(500)') # Estuary skin, grid mode.
     xbmcplugin.addDirectoryItems(__handle__, alignedItems)
     xbmcplugin.endOfDirectory(__handle__)
+    xbmc.executebuiltin('Container.SetViewMode(500)') # Estuary skin, grid mode.
+    if indexFrom != -1:
+        selectWindowIndex( indexFrom )
+    elif indexTo != -1:
+        selectWindowIndex( indexTo )
 
 
 def viewSave():
@@ -67,55 +70,48 @@ def viewSave():
     global FAVOURITES_PATH
     dialog = xbmcgui.Dialog()
     dialog.notification( 'Swap Favourites', 'Saving...', 
-    	                    xbmcgui.NOTIFICATION_INFO, 1500, False ) # No sound.
+    	                    xbmcgui.NOTIFICATION_INFO, 1600, False ) # No sound.
     favs = getWindowProperty(FAVS_PROP)
     if favs:
-        builder = ET.TreeBuilder()
-        builder.start('favourites', { } )
-        for f in favs:
-            builder.start('favourite', f['attrib'] )
-            builder.data( f['text'] )
-            builder.end('favourite')
-        builder.end('favourites')
-        tree = builder.close()
-        file = xbmcvfs.File(FAVOURITES_PATH, 'w')
+        data = '<favourites>' + ''.join( [ f['original'] for f in favs ] ) + '</favourites>'
+        tree = ET.fromstring( data )
         treeIndent( tree )
-        file.write( ET.tostring(tree, encoding='utf-8') )
+        file = xbmcvfs.File(FAVOURITES_PATH, 'w')
+        file.write( ET.tostring( tree, encoding='utf-8') )
         file.close()
         clearWindowProperty(FAVS_PROP)
-        xbmc.sleep(200)
+        clearWindowProperty(PAD_PROP)
+        xbmc.sleep(100) # Just to give the I/O some time.
         xbmc.executebuiltin('LoadProfile(Master user)') # Reloads 'favourites.xml'.
 
 
-def viewSwap(params):
-    global __handle__
+def viewInsert(params):
     indexFrom = int( params.get('from', [-1])[0] )
     indexTo = int( params.get('to', [-1])[0] )
-    
-    if indexFrom != -1 and indexTo != -1:
+    if indexFrom != -1 and indexTo != -1 and indexFrom != indexTo:
         global FAVS_PROP
         favs = getWindowProperty(FAVS_PROP)
-        if favs:        
-            favs[indexFrom], favs[indexTo] = favs[indexTo], favs[indexFrom]
-            setWindowProperty(FAVS_PROP, favs)
-            
-    url = buildUrl( {'indexFrom':'-1'} )
-    xbmc.executebuiltin('Container.Update(' + url + ',replace)')
+        if favs:
+            # New method, reinsert.
+            favs.insert( indexTo, favs.pop( indexFrom ) )
+            setWindowProperty( FAVS_PROP,  favs )
+    url = buildUrl( {'from': -1, 'to': indexTo} ) # 'indexTo' is set so it can be auto-selected.
+    xbmc.executebuiltin('Container.Update(%s,replace)' % url)
 
 
 def viewReset():
-    favs = loadFavs()
-    url = buildUrl( {'from':'-1'} )
-    xbmc.executebuiltin('Container.Update( ' + url + ',replace)')
+    loadFavs()
+    url = buildUrl( {'from': -1} )
+    xbmc.executebuiltin('Container.Update(%s,replace)' % url)
 
 
 # This is needed to bypass Kodi's URL history behaviour
 # since those ListItems are not folders.
 def viewReroute(params):
-    indexFrom = int( params.get('from', [-1])[0] )
-    indexTo = int( params.get('to', [-1])[0] )
+    indexFrom = params.get('from', [-1])[0]
+    indexTo = params.get('to', [-1])[0]
     url = buildUrl( {'from':indexFrom, 'to':indexTo} )
-    xbmc.executebuiltin('Container.Update( '+ url + ',replace)')
+    xbmc.executebuiltin('Container.Update(%s,replace)' % url)
     
 #===================================================================================    
     
@@ -141,10 +137,23 @@ def clearWindowProperty(prop):
     currentWindow.clearProperty(prop)
 
 
+def selectWindowIndex( index ):
+    currentWindow = xbmcgui.Window( xbmcgui.getCurrentWindowId() )
+    padding = currentWindow.getProperty(PAD_PROP)
+    index += int( padding ) if padding else 0
+    cID = currentWindow.getFocusId()
+    try:
+        currentWindow.getControl(cID).selectItem(index)
+    except:
+        pass
+
+
 def loadFavs():
     global FAVOURITES_PATH
     global THUMBNAILS_PATH
     global FAVS_PROP
+    global PAD_PROP
+
     file = xbmcvfs.File(FAVOURITES_PATH)
     tree = ET.fromstring(file.read())
     file.close()
@@ -154,8 +163,17 @@ def loadFavs():
         cache = xbmc.getCacheThumbName(thumb).replace('.tbn', '.jpg')
         path = THUMBNAILS_PATH + '%s/%s' % (cache[0], cache)
         cache = thumb if ( cache.startswith('ffffffff') or not xbmcvfs.exists(path) ) else path
-        favs.append( {'name': f.get('name', ''), 'cache': cache, 'attrib': f.attrib, 'text': f.text } )
+        favs.append( {'name': f.get('name', ''), 'cache': cache, 'original': ET.tostring(f, encoding='utf-8')} )
     setWindowProperty(FAVS_PROP, favs)
+   
+    # Padding, helps with the auto-selection.
+    rpcQuery = { 'jsonrpc': '2.0', 'id': '1', 'method': 'Settings.GetSettingValue',
+                           'params': {'setting': 'filelists.showparentdiritems'} }
+    r = json.loads( xbmc.executeJSONRPC( json.dumps(rpcQuery) ) )
+    padding = 1 if r['result'].get('value', False) else 0
+    padding += 3 if padding and xbmc.getSkinDir().endswith('estuary') else 0 # For the dummy items we add on Estuary.
+    setWindowProperty(PAD_PROP, padding)
+
     return favs
 
 
@@ -182,8 +200,8 @@ def treeIndent(elem, level=0):
 params = urlparse.parse_qs(sys.argv[2][1:])
 if 'save' in params:
     viewSave()
-elif 'swap' in params:
-    viewSwap(params)
+elif 'insert' in params:
+    viewInsert(params)
 elif 'reset' in params:
     viewReset()
 elif 'reroute' in params:
