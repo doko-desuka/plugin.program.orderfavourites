@@ -69,7 +69,7 @@ def viewSave():
     global FAVS_PROP
     global FAVOURITES_PATH
     dialog = xbmcgui.Dialog()
-    dialog.notification( 'Swap Favourites', 'Saving...', 
+    dialog.notification( 'Order Favourites', 'Saving...', 
     	                    xbmcgui.NOTIFICATION_INFO, 1600, False ) # No sound.
     favs = getWindowProperty(FAVS_PROP)
     if favs:
