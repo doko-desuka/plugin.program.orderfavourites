@@ -82,8 +82,9 @@ def viewSave():
         clearWindowProperty(FAVS_PROP)
         clearWindowProperty(PAD_PROP)
         xbmc.sleep(100) # Just to give the I/O some time.
-        xbmc.executebuiltin('LoadProfile(Master user)') # Reloads 'favourites.xml'.
-
+		profileName = xbmc.getInfoLabel('System.ProfileName')
+        xbmc.executebuiltin('LoadProfile(%s)' % profileName) # Reloads 'favourites.xml'.
+		
 
 def viewInsert(params):
     indexFrom = int( params.get('from', [-1])[0] )
