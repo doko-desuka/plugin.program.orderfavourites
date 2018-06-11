@@ -14,21 +14,21 @@ THUMBNAILS_PATH = xbmc.translatePath('special://thumbnails').decode('utf-8')
 FAVS_PROP = 'orderfavourites.favourites'
 PAD_PROP = 'orderfavourites.padding'
 
-#===================================================================================		
-    
+#===================================================================================
+
 def viewFavourites(params):
     global __handle__
     global FAVS_PROP
-    
+
     if not params:
         params = { }
     indexFrom = int( params.get('from', [-1])[0] )
     indexTo = int( params.get('to', [-1])[0] )
-    
+
     favs = getWindowProperty(FAVS_PROP)
     if not favs:
         favs = loadFavs()
-    
+
     listItems = [ ]
     for index, f in enumerate(favs):
         li = xbmcgui.ListItem( '[COLOR yellow][B]'+f['name']+'[/B][/COLOR]' if index == indexFrom else f['name'] )
@@ -41,15 +41,15 @@ def viewFavourites(params):
             urlParams = {'from': index, 'to': -1, 'reroute': 1}
         url = buildUrl(urlParams)
         listItems.append( (url, li, False) )
-    
+
     liSave = xbmcgui.ListItem('[COLOR greenyellow]SAVE[/COLOR]')
     saveUrl = buildUrl( {'save':1} )
     listItems.append( (saveUrl, liSave, False) )
-    
+
     liReset = xbmcgui.ListItem('[COLOR hotpink]RESET[/COLOR]')
     resetUrl = buildUrl( {'reset':1} )
     listItems.append( (resetUrl, liReset, False) )
-    
+
     # Add dummy items as padding so the grid shows 4 per row like the Favourites screen.
     if getWindowProperty(PAD_PROP) > 1:
         alignedItems = [ ('', xbmcgui.ListItem(''), False) for n in range(3) ] + listItems
@@ -69,8 +69,8 @@ def viewSave():
     global FAVS_PROP
     global FAVOURITES_PATH
     dialog = xbmcgui.Dialog()
-    dialog.notification( 'Order Favourites', 'Saving...', 
-    	                    xbmcgui.NOTIFICATION_INFO, 1600, False ) # No sound.
+    dialog.notification( 'Order Favourites', 'Saving...',
+                            xbmcgui.NOTIFICATION_INFO, 2000, False ) # No sound.
     favs = getWindowProperty(FAVS_PROP)
     if favs:
         data = '<favourites>' + ''.join( [ f['original'] for f in favs ] ) + '</favourites>'
@@ -82,9 +82,9 @@ def viewSave():
         clearWindowProperty(FAVS_PROP)
         clearWindowProperty(PAD_PROP)
         xbmc.sleep(100) # Just to give the I/O some time.
-		profileName = xbmc.getInfoLabel('System.ProfileName')
+        profileName = xbmc.getInfoLabel('System.ProfileName')
         xbmc.executebuiltin('LoadProfile(%s)' % profileName) # Reloads 'favourites.xml'.
-		
+
 
 def viewInsert(params):
     indexFrom = int( params.get('from', [-1])[0] )
@@ -113,9 +113,9 @@ def viewReroute(params):
     indexTo = params.get('to', [-1])[0]
     url = buildUrl( {'from':indexFrom, 'to':indexTo} )
     xbmc.executebuiltin('Container.Update(%s,replace)' % url)
-    
-#===================================================================================    
-    
+
+#===================================================================================
+
 def buildUrl(query):
     return sys.argv[0] + '?' + urllib.urlencode(query)
 
@@ -166,7 +166,7 @@ def loadFavs():
         cache = thumb if ( cache.startswith('ffffffff') or not xbmcvfs.exists(path) ) else path
         favs.append( {'name': f.get('name', ''), 'cache': cache, 'original': ET.tostring(f, encoding='utf-8')} )
     setWindowProperty(FAVS_PROP, favs)
-   
+
     # Padding, helps with the auto-selection.
     rpcQuery = { 'jsonrpc': '2.0', 'id': '1', 'method': 'Settings.GetSettingValue',
                            'params': {'setting': 'filelists.showparentdiritems'} }
