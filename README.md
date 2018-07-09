@@ -5,3 +5,7 @@ Simple Kodi addon that lets you reorder entries in your favourites, to organise 
 * Select another item where you want to insert the previous one.
 * Do this as much as you want to organise your favourites. When you're done, go to the bottom of the grid and select SAVE to commit your changes.
 * If you want to start over, go to the bottom of the grid and select RESET instead, so your favourites file gets reloaded.
+
+### Install it from my repo:
+Install this repo, then you'll find Order Favourites in the Programs category:  
+[doko.repository](https://github.com/dokoab/doko.repository/releases/download/0.1.0/doko.repository-0.1.0.zip)  
