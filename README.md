@@ -1,5 +1,5 @@
 # plugin.program.orderfavourites
-A simple Kodi add-on that lets you reorder entries in your favourites, to organise them. It works best with the Estuary skin (the default Kodi 17.6 skin).
+A simple Kodi addon that lets you reorder entries in your favourites, to organise them. It works best with the Estuary skin (the default Kodi 17.6 skin).
 * Open the addon to view your favourites.
 * Mark an item by selecting it.
 * Select another item where you want to insert the previous one.
