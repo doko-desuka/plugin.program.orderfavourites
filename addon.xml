@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.program.orderfavourites" name="Order Favourites" version="1.0.1" provider-name="doko">
+<addon id="plugin.program.orderfavourites" name="Order Favourites" version="1.0.4" provider-name="doko">
   <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="xbmc.python" version="2.20.0"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="default.py">
     <provides>executable</provides>
   </extension>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en"></summary>
-    <description lang="en">Lets you reorder the entries in your Favourites.[CR]Use this to organize your Favourites.[CR][CR]- Use SAVE to commit your changes.[CR]- Use RESET to reload the favourites file and start over.</description>
-    <disclaimer lang="en"></disclaimer>
+    <news>
+[COLOR lavender][B]Order Favourites[/B][/COLOR]
+[B]1.0.4:[/B]
+- Safer handling of unicode text.
+- Optimizations, simplified the code even more.
+
+[B]1.0.3:[/B]
+- Added a proper custom dialog interface.
+- Greatly simplified the code, much faster to use.
+
+[B]1.0.2:[/B]
+- Fix for when the favorite item has unicode text.
+    </news>
+    <description lang="en">
+Lets you reorder the entries in your Favourites.
+Use this to organize your Favourites.
+    </description>
     <platform>all</platform>
   </extension>
 </addon>

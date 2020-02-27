@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>    
+<window>
+    <defaulcontrol>100</defaulcontrol>
+	<controls>
+        <control type="group">
+			<centertop>50%</centertop>
+			<centerleft>50%</centerleft>
+			<width>1800</width>
+            <height>960</height>
+        
+            <!-- Mostly copied from the Estuary skin XMLs. -->
+            <control type="image">
+                <!-- Background underlay. -->
+                <left>-2000</left>
+                <top>-2000</top>
+                <width>6000</width>
+                <height>6000</height>
+                <animation effect="fade" time="300">VisibleChange</animation>
+                <animation effect="fade" start="0" end="100" time="300">WindowOpen</animation>
+                <animation effect="fade" start="100" end="0" time="200">WindowClose</animation>
+                <texture colordiffuse="B0000000">BGWhite.png</texture>
+            </control>
+            <control type="button">
+                <!-- Invisible button, clicking outside of the dialog area closes it. -->
+                <left>-2000</left>
+                <top>-2000</top>
+                <width>6000</width>
+                <height>6000</height>
+                <texturefocus />
+                <texturenofocus />
+                <onclick>Action(close)</onclick>
+            </control>
+            <control type="group">
+                <!-- Dialog body. -->
+                <width>1800</width>
+                <height>960</height>
+                <control type="image">
+                    <left>0</left>
+                    <top>0</top>
+                    <right>0</right>
+                    <bottom>0</bottom>
+                    <texture colordiffuse="FF1A2123">BGWhite.png</texture>
+                </control>
+                <!-- Header. -->
+                <control type="image">
+                    <left>0</left>
+                    <right>0</right>
+                    <top>0</top>
+                    <height>70</height>
+                    <texture colordiffuse="FF12A0C7">BGWhite.png</texture>
+                </control>
+                <control type="label">
+                    <left>20</left>
+                    <right>0</right>
+                    <top>0</top>
+                    <aligny>center</aligny>
+                    <height>70</height>
+                    <label>[B]Order Favourites[/B]</label>
+                    <shadowcolor>black</shadowcolor>
+                </control>
+                <!-- "button overlay to avoid closing in dialog area." -->
+                <control type="button" id="22002">
+                    <description></description>
+                    <left>0</left>
+                    <top>0</top>
+                    <right>0</right>
+                    <bottom>0</bottom>
+                    <texturefocus />
+                    <texturenofocus />
+                    <onclick>noop</onclick>
+                </control>
+            </control>
+            
+            <!-- Panel with the content. -->
+            <control type="group" id="100">
+                <control type="panel" id="101">
+                    <top>80</top>
+                    <left>10</left>
+                    <right>300</right>
+                    <onleft>301</onleft>
+                    <onright>200</onright>
+                    <onup>101</onup>
+                    <ondown>101</ondown>
+                    <preloaditems>2</preloaditems>
+                    <pagecontrol>200</pagecontrol>
+                    <scrolltime tween="sine">200</scrolltime>
+                    <orientation>vertical</orientation>
+                    
+                    <!-- Content of normal ListItem elements. -->
+                    <itemlayout width="290" height="390">
+                        <control type="image">
+                            <visible>String.IsEmpty(ListItem.Property(selected))</visible>
+                            <texture colordiffuse="60000000">BGWhite.png</texture>
+                            <bordersize>10</bordersize>
+                        </control>
+                        <control type="image">
+                            <width>290</width>
+                            <height>290</height>
+                            <texture fallback="DefaultFavourites.png" background="true">$INFO[ListItem.Art(thumb)]</texture>
+                            <aspectratio>keep</aspectratio>
+                            <bordersize>10</bordersize>
+                        </control>
+                        <control type="image">
+                            <!-- To get a highlight for the first selected item we need to add another
+                            image element. The "clean" way to do this would be to change the color of a single
+                            image control using a variable in Variables.xml, but then that extra file is needed. -->
+                            <visible>!String.IsEmpty(ListItem.Property(selected))</visible>
+                            <texture colordiffuse="5040F0FF">BGWhite.png</texture>
+                            <bordersize>10</bordersize>
+                        </control>
+                        <control type="textbox">
+                            <top>290</top>
+                            <left>10</left>
+                            <right>10</right>
+                            <height>90</height>
+                            <font>font12</font>
+                            <align>center</align>
+                            <aligny>center</aligny>
+                            <label>$INFO[ListItem.Label]</label>
+                            <visible>!String.IsEqual(ListItem.DBType,album)</visible>
+                        </control>
+                    </itemlayout>
+
+                    <!-- Content of the focused ListItem element(s). -->
+                    <focusedlayout width="290" height="390">
+                        <control type="image">
+                            <left>-5</left>
+                            <top>-5</top>
+                            <right>-5</right>
+                            <bottom>-5</bottom>
+                            <texture colordiffuse="FF12A0C7">BGWhite.png</texture>
+                            <bordersize>10</bordersize>
+                        </control>
+                        <control type="image">
+                            <height>290</height>
+                            <texture fallback="DefaultFavourites.png" background="true">$INFO[ListItem.Art(thumb)]</texture>
+                            <aspectratio>keep</aspectratio>
+                            <bordersize>10</bordersize>
+                        </control>
+                        <control type="textbox">
+                            <top>290</top>
+                            <left>10</left>
+                            <right>10</right>
+                            <height>90</height>
+                            <font>font12</font>
+                            <align>center</align>
+                            <aligny>center</aligny>
+                            <label>$INFO[ListItem.Label]</label>
+                            <visible>!String.IsEqual(ListItem.DBType,album)</visible>
+                        </control>
+                        <control type="image">
+                            <visible>!String.IsEmpty(ListItem.Property(selected))</visible>
+                            <left>-5</left>
+                            <top>-5</top>
+                            <right>-5</right>
+                            <bottom>-5</bottom>
+                            <texture colordiffuse="8010C0CF">BGWhite.png</texture>
+                            <bordersize>10</bordersize>
+                        </control>
+                    </focusedlayout>                     
+                </control>
+            </control>
+            
+            <!-- Scrollbar for the content. -->
+            <control type="scrollbar" id="200">
+				<top>70</top>
+                <right>310</right>
+				<width>20</width>
+				<bottom>0</bottom>
+				<onleft>100</onleft>
+				<onright>301</onright>
+				<orientation>vertical</orientation>
+			</control>
+            
+            <!-- Buttons. -->
+            <control type="image">
+                <top>70</top>
+                <right>0</right>
+                <width>310</width>
+                <texture colordiffuse="FF313839">BGWhite.png</texture>
+            </control>
+            <control type="grouplist">
+                <right>20</right>
+                <width>270</width>
+				<top>90</top>
+                <bottom>0</bottom>
+				<itemgap>50</itemgap>
+                <control type="button" id="301">
+                    <height>100</height>
+                    <onleft>200</onleft>
+                    <onright>100</onright>
+                    <textcolor>white</textcolor>
+                    <label>[B]Save &amp; Close[/B]</label>
+                    <align>center</align>
+                    <texturefocus colordiffuse="FF12A0C7">BGWhite.png</texturefocus>
+                    <texturenofocus colordiffuse="30FFFFFF">BGWhite.png</texturenofocus>
+                </control>
+                <control type="button" id="302">
+                    <height>100</height>
+                    <onleft>200</onleft>
+                    <onright>100</onright>
+                    <textcolor>white</textcolor>
+                    <label>[B]Reset[/B]...</label>
+                    <align>center</align>
+                    <texturefocus colordiffuse="FF12A0C7">BGWhite.png</texturefocus>
+                    <texturenofocus colordiffuse="30FFFFFF">BGWhite.png</texturenofocus>
+                </control>                
+                <control type="button" id="303">
+                    <height>100</height>
+                    <onleft>200</onleft>
+                    <onright>100</onright>
+                    <textcolor>white</textcolor>
+                    <label>[B]Cancel[/B]</label>
+                    <align>center</align>
+                    <texturefocus colordiffuse="FF12A0C7">BGWhite.png</texturefocus>
+                    <texturenofocus colordiffuse="30FFFFFF">BGWhite.png</texturenofocus>
+                </control>
+			</control>
+		</control>
+	</controls>
+</window>
