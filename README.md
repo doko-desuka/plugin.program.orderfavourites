@@ -1,6 +1,9 @@
 # Order Favourites (plugin.program.orderfavourites)
 ![icon](https://github.com/doko-desuka/plugin.program.orderfavourites/raw/master/icon.png)  
-This is a simple & lightweight program add-on that lets you quickly reorganize your Kodi favourites.  
+### This is a simple & lightweight program add-on that lets you quickly reorganize your Kodi favourites.  
+### Install it from [this zip here](https://github.com/doko-desuka/doko.repository/raw/master/plugin.program.orderfavourites/plugin.program.orderfavourites-1.1.1.zip) or from [my repository](https://github.com/dokoab/doko.repository/releases).
+
+----
 The main menu shows 3 options:
 
 ### 1) Order favourites...  
@@ -14,7 +17,5 @@ Saves your changes and reloads your Kodi profile (so your changes can be seen im
 
 ### 3) Exit only
 Just steps back from the add-on, no saving.
-
-Install it from [this zip here](https://github.com/doko-desuka/doko.repository/raw/master/plugin.program.orderfavourites/plugin.program.orderfavourites-1.1.1.zip) or from [my repository](https://github.com/dokoab/doko.repository/releases).
 
 PS: This add-on is archived. Feel free to fork and modify it, the code is public domain.
