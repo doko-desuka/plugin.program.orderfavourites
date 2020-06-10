@@ -5,7 +5,7 @@
         <control type="group">
 			<centertop>50%</centertop>
 			<centerleft>50%</centerleft>
-			<width>1800</width>
+			<width>1510</width>
             <height>960</height>
         
             <!-- Mostly copied from the Estuary skin XMLs. -->
@@ -32,7 +32,7 @@
             </control>
             <control type="group">
                 <!-- Dialog body. -->
-                <width>1800</width>
+                <width>1510</width>
                 <height>960</height>
                 <control type="image">
                     <left>0</left>
@@ -190,7 +190,7 @@
                     <onleft>200</onleft>
                     <onright>100</onright>
                     <textcolor>white</textcolor>
-                    <label>[B]Save &amp; Close[/B]</label>
+                    <label>[B]Close[/B]</label>
                     <align>center</align>
                     <texturefocus colordiffuse="FF12A0C7">BGWhite.png</texturefocus>
                     <texturenofocus colordiffuse="30FFFFFF">BGWhite.png</texturenofocus>
@@ -200,17 +200,7 @@
                     <onleft>200</onleft>
                     <onright>100</onright>
                     <textcolor>white</textcolor>
-                    <label>[B]Reset[/B]...</label>
-                    <align>center</align>
-                    <texturefocus colordiffuse="FF12A0C7">BGWhite.png</texturefocus>
-                    <texturenofocus colordiffuse="30FFFFFF">BGWhite.png</texturenofocus>
-                </control>                
-                <control type="button" id="303">
-                    <height>100</height>
-                    <onleft>200</onleft>
-                    <onright>100</onright>
-                    <textcolor>white</textcolor>
-                    <label>[B]Cancel[/B]</label>
+                    <label>[B]Reset...[/B]</label>
                     <align>center</align>
                     <texturefocus colordiffuse="FF12A0C7">BGWhite.png</texturefocus>
                     <texturenofocus colordiffuse="30FFFFFF">BGWhite.png</texturenofocus>
