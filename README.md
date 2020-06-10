@@ -5,7 +5,7 @@ You select one item, and then select again where you want to put that item. Do t
 
 This add-on is archived. Feel free to fork and modify it, the code is public domain.
 
-Install it from [this zip here](https://github.com/doko-desuka/doko.repository/raw/master/plugin.program.orderfavourites/plugin.program.orderfavourites-1.0.4.zip) or from [my repository](https://github.com/dokoab/doko.repository/releases).
+Install it from [this zip here](https://github.com/doko-desuka/doko.repository/raw/master/plugin.program.orderfavourites/plugin.program.orderfavourites-1.1.1.zip) or from [my repository](https://github.com/dokoab/doko.repository/releases).
 
 ![icon](https://github.com/doko-desuka/plugin.program.orderfavourites/raw/master/icon.png)
 
