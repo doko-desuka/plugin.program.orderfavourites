@@ -4,8 +4,10 @@
 #
 # doko-desuka 2020
 # ====================================================================
-import sys
 import re
+import sys
+import json
+import traceback
 try:
     # Python 2.x
     from HTMLParser import HTMLParser
@@ -13,12 +15,21 @@ try:
 except ImportError:
     # Python 3.4+ (see https://stackoverflow.com/a/2360639)
     import html
-    PARSER = html    
+    PARSER = html
 
-import xbmc, xbmcaddon, xbmcgui, xbmcvfs
+import xbmc, xbmcgui, xbmcplugin, xbmcvfs
+from xbmcaddon import Addon
+
 
 FAVOURITES_PATH = 'special://userdata/favourites.xml'
 THUMBNAILS_PATH_FORMAT = 'special://thumbnails/{folder}/{file}'
+
+PROPERTY_FAVOURITES_RESULT = 'ordfav.result'
+
+ADDON = Addon()
+PLUGIN_ID = int(sys.argv[1])
+PLUGIN_URL = sys.argv[0]
+
 
 # Custom Favourites window class for managing the favourites items.
 class CustomFavouritesDialog(xbmcgui.WindowXMLDialog):
@@ -29,12 +40,11 @@ class CustomFavouritesDialog(xbmcgui.WindowXMLDialog):
         # the custom skin XML bundled with this add-on (/resources/skins/Default/1080i/CustomFavouritesDialog.XML).
         self.idHandlerDict = {
             101: self.doSelect,
-            301: self.doSave,
+            301: self.close,
             302: self.doReload,
-            303: self.doClose
         }
 
-        # Map action IDs to handler custom methods, see more action IDs in
+        # Map action IDs to custom handler methods. See more action IDs in
         # https://github.com/xbmc/xbmc/blob/master/xbmc/input/actions/ActionIDs.h
         self.actionHandlerDict = {
             # All click/select actions are already handled by 'idHandlerDict' above.
@@ -51,7 +61,7 @@ class CustomFavouritesDialog(xbmcgui.WindowXMLDialog):
 
 
     # Function used to start the dialog.
-    def doCustomModal(self, favouritesGen, saveHandler):
+    def doCustomModal(self, favouritesGen):
         allItems = [ ]
         artDict = {'thumb': None}
         for index, data in enumerate(favouritesGen):
@@ -62,20 +72,21 @@ class CustomFavouritesDialog(xbmcgui.WindowXMLDialog):
             li.setArt(artDict)
             li.setProperty('index', str(index)) # To help with resetting, if necessary.
             allItems.append(li)
-            
+
+        self.allItems = allItems
         self.indexFrom = None # Integer index of the source item (or None when nothing is selected).
-        self.allItems = allItems        
-        self.saveHandler = saveHandler
-        
+        self.isDirty = False # Bool saying if there were any user-made changes at all.
+
         self.doModal()
+        return self._makeResult() if self.isDirty else ''
 
 
-    # Automatically called before the dialog is shown, the UI controls exist now.
+    # Automatically called before the dialog is shown. The UI controls exist now.
     def onInit(self):
         self.panel = self.getControl(101)
         self.panel.reset()
         self.panel.addItems(self.allItems)
-        self.setFocusId(100) # Focus the group containing the panel.
+        self.setFocusId(100) # Focus the group containing the panel, not the panel itself.
 
 
     def onClick(self, controlId):
@@ -93,23 +104,24 @@ class CustomFavouritesDialog(xbmcgui.WindowXMLDialog):
             self.indexFrom = selectedPosition
             self.panel.getSelectedItem().setProperty('selected', '1')
         else:
-            # Something was already selected.
+            # Something was already selected, so do the reodering.
             if self.indexFrom != selectedPosition:
-                # User selected a different item, so consider the new index as the destination.
+                # Reorder using the .pop() and .insert() methods of the 'self.allItems' list.
                 itemFrom = self.allItems.pop(self.indexFrom)
-                self.allItems.insert(selectedPosition, itemFrom)     
+                self.allItems.insert(selectedPosition, itemFrom)
+                self.isDirty = True
                 
                 # Reset the selection state.
                 self.indexFrom = None
                 itemFrom.setProperty('selected', '')
-                
-                # Update the panel.
+
+                # Update the panel by clearing it and readding all the items.
                 self.panel.reset()
                 self.panel.addItems(self.allItems)
                 self.panel.selectItem(selectedPosition)
             else: # User reselected the item, so just unmark it.
                 self.indexFrom = None
-                self.panel.getSelectedItem().setProperty('selected', '')                        
+                self.panel.getSelectedItem().setProperty('selected', '')
 
 
     def doUnselectClose(self):
@@ -118,40 +130,24 @@ class CustomFavouritesDialog(xbmcgui.WindowXMLDialog):
             self.allItems[self.indexFrom].setProperty('selected', '')
             self.indexFrom = None
         else:
-            self.doClose()           
-            
-            
-    def doClose(self):
-        xbmc.executebuiltin('ActivateWindow(home)') # Return to the Home screen (https://kodi.wiki/view/Window_IDs).
-        self.close()
-            
+            self.close()
+
 
     def doReload(self):
         if xbmcgui.Dialog().yesno(
             'Order Favourites',
-            'This will undo any of your changes and restore the order from your Favourites file.\nProceed?'
+            'This will forget any of your changes and restore the order from before this dialog was opened.\nProceed?'
         ):
             # Re-sort all items based on their original indices.
-            self.indexFrom = None        
-            self.allItems = sorted(self.allItems, key=lambda li: int(li.getProperty('index')))        
-            self.panel.reset()        
-            self.panel.addItems(self.allItems)        
+            self.indexFrom = None
+            self.allItems = sorted(self.allItems, key=lambda li: int(li.getProperty('index')))
+            self.panel.reset()
+            self.panel.addItems(self.allItems)
 
 
-    def doSave(self):
-        if self.saveHandler(self.allItems):
-            self.close()
-            xbmcgui.Dialog().ok('Order Favourites', 'Save complete. Reloading home screen now...')
-            # Reload the current profile (which causes a reload of 'favourites.xml').
-            xbmc.executebuiltin('LoadProfile(%s)' % xbmc.getInfoLabel('System.ProfileName'))
-        else:
-            xbmcgui.Dialog().notification(
-                'Order Favourites',
-                'Could not save the favourites file',
-                xbmcgui.NOTIFICATION_WARNING,
-                3000,
-                False
-            )
+    def _makeResult(self):
+        INDENT_STRING = ' ' * 4
+        return '<favourites>\n' + '\n'.join((INDENT_STRING + li.getPath()) for li in self.allItems) + '</favourites>\n'
 
 
 def favouritesDataGen():
@@ -164,14 +160,14 @@ def favouritesDataGen():
 
     for entryMatch in re.finditer('(<favourite\s[^<]+</favourite>)', contents):
         entry = entryMatch.group(1)
-        
+
         match = namePattern.search(entry)
         name = PARSER.unescape(match.group(1)) if match else ''
-        
+
         match = thumbPattern.search(entry)
         if match:
             thumb = PARSER.unescape(match.group(1))
-            cacheFilename = xbmc.getCacheThumbName(thumb)            
+            cacheFilename = xbmc.getCacheThumbName(thumb)
             if 'ffffffff' not in cacheFilename:
                 if '.jpg' in thumb:
                     cacheFilename = cacheFilename.replace('.tbn', '.jpg', 1)
@@ -180,22 +176,36 @@ def favouritesDataGen():
                 thumb = THUMBNAILS_PATH_FORMAT.format(folder=cacheFilename[0], file=cacheFilename)
         else:
             thumb = ''
-            
-        # Yield a 3-tuple of name, thumb-url and original favourites entry content.
+
+        # Yield a 3-tuple of name, thumb-url and the original content of the favourites entry.
         yield name, thumb, entry
 
 
-def doSave(allItems):
-    # allItems = list of ListItems in the order they should be. Their 'path' holds the XML text of each item.
-    INDENT_STRING = ' ' * 4
-    xmlText = '<favourites>\n' + '\n'.join((INDENT_STRING + li.getPath()) for li in allItems) + '</favourites>\n'
+def saveFavourites(xmlText):
+    if not xmlText:
+        return False
     try:
         file = xbmcvfs.File(FAVOURITES_PATH, 'w')
         file.write(xmlText)
         file.close()
     except:
-        return False
+        raise Exception('ERROR: unable to update the Favourites file. Nothing was saved.')    
     return True
+
+
+def getRawWindowProperty(prop):
+    window = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+    return window.getProperty(prop)
+
+
+def setRawWindowProperty(prop, data):
+    window = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+    window.setProperty(prop, data)
+
+
+def clearWindowProperty(prop):
+    window = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+    window.clearProperty(prop)
 
 
 # Debugging helper. Logs a LOGNOTICE-level message.
@@ -206,6 +216,64 @@ def xbmcLog(*args):
 
 ### Entry point ###
 
-ui = CustomFavouritesDialog('CustomFavouritesDialog.xml', xbmcaddon.Addon().getAddonInfo('path'))
-ui.doCustomModal(favouritesDataGen(), doSave)
-del ui # Delete the dialog instance after it's done, as it's not garbage collected.
+if '/dialog' in PLUGIN_URL:
+    ui = CustomFavouritesDialog('CustomFavouritesDialog.xml', ADDON.getAddonInfo('path'), 'Default', '1080i')
+    try:
+        result = ui.doCustomModal(favouritesDataGen())
+        setRawWindowProperty(PROPERTY_FAVOURITES_RESULT, result)
+    except:
+        clearWindowProperty(PROPERTY_FAVOURITES_RESULT)
+    finally:
+        del ui # Delete the dialog instance after it's done, as it's not garbage collected.
+
+elif '/save_reload' in PLUGIN_URL:
+    # Reload the current profile (which causes a reload of 'favourites.xml').
+    try:
+        if not saveFavourites(getRawWindowProperty(PROPERTY_FAVOURITES_RESULT)):
+            # Nothing to save, so just "exit" (go back from) the add-on.
+            xbmc.executebuiltin('Action(Back)')
+        else:
+            clearWindowProperty(PROPERTY_FAVOURITES_RESULT)
+            xbmcgui.Dialog().ok('Order Favourites', 'Save successful, press OK to continue...')
+            xbmc.executebuiltin('LoadProfile(%s)' % xbmc.getInfoLabel('System.ProfileName'))
+            # Alternative way of issuing a profile reload, using JSON-RPC:
+            #rpcQuery = (
+            #    '{"jsonrpc": "2.0", "id": "1", "method": "Profiles.LoadProfile", "params": {"profile": "%s"}}'
+            #    % xbmc.getInfoLabel('System.ProfileName')
+            #)
+            #xbmc.executeJSONRPC(rpcQuery)
+    except Exception as e:
+        xbmcgui.Dialog().ok('Order Favourites', str(e))
+        xbmcLog(traceback.format_exc())
+
+elif '/exit_only' in PLUGIN_URL:
+    # Clear the results property and go back one screen (to wherever the user came from).
+    clearWindowProperty(PROPERTY_FAVOURITES_RESULT)
+    xbmc.executebuiltin('Action(Back)')
+    # Alternative action, going to the Home screen.
+    #xbmc.executebuiltin('ActivateWindow(home)') # ID taken from https://kodi.wiki/view/Window_IDs
+
+else:
+    # Create the menu items.
+    xbmcplugin.setContent(PLUGIN_ID, 'files')
+
+    dialogItem = xbmcgui.ListItem('[COLOR lavender][B]Order favourites...[/B][/COLOR]')
+    dialogItem.setArt({'thumb': 'DefaultAddonContextItem.png'})
+    dialogItem.setInfo('video', {'plot': 'Open the dialog where you can order your favourites.'})
+    saveExitItem = xbmcgui.ListItem('[COLOR lavender][B]Save and exit[/B][/COLOR]')
+    saveExitItem.setArt({'thumb': 'DefaultAddonsUpdates.png'})
+    saveExitItem.setInfo('video', {'plot': 'Save any changes you made, and reload your Kodi profile '
+                                       'to make the changes visible without having to restart Kodi.'})
+    exitItem = xbmcgui.ListItem('[COLOR lavender][B]Exit only[/B][/COLOR]')
+    exitItem.setArt({'thumb': 'DefaultFolderBack.png'})
+    exitItem.setInfo('video', {'plot': 'Exit the add-on (same as pressing Back), without saving your changes.'})
+    xbmcplugin.addDirectoryItems(
+        PLUGIN_ID,
+        (
+            # PLUGIN_URL already ends with a slash, so just append the route to it.
+            (PLUGIN_URL + 'dialog', dialogItem, False),
+            (PLUGIN_URL + 'save_reload', saveExitItem, False),
+            (PLUGIN_URL + 'exit_only', exitItem, False)
+        )
+    )
+    xbmcplugin.endOfDirectory(PLUGIN_ID)
