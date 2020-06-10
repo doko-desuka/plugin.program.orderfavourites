@@ -10,4 +10,4 @@ Install it from [this zip here](https://github.com/doko-desuka/doko.repository/r
 ![icon](https://github.com/doko-desuka/plugin.program.orderfavourites/raw/master/icon.png)
 
 ![example](https://images2.imgbox.com/a0/04/ISjDXt4Z_o.gif)  
-(Those numbered thumbs are just so you can understand what's going on, the add-on uses your actual favorites posters.)
+(The add-on uses your actual favorites posters. Those numbered thumbs are just so you can understand what's going on.)
