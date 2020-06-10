@@ -1,13 +1,20 @@
-# plugin.program.orderfavourites
-This is a simple & lightweight program add-on that lets you quickly reorganize your Kodi favourites. 
-When you run the add-on it will show all of your favorites on a dialog.
-You select one item, and then select again where you want to put that item. Do this until you've reorganized all the items you want and then click the "Save & Close" button to commit your changes (you can also hit "Reset" to undo your changes and start over).
+# Order Favourites (plugin.program.orderfavourites)
+![icon](https://github.com/doko-desuka/plugin.program.orderfavourites/raw/master/icon.png)  
+This is a simple & lightweight program add-on that lets you quickly reorganize your Kodi favourites.  
+The main menu shows 3 options:
 
-This add-on is archived. Feel free to fork and modify it, the code is public domain.
+### 1) Order favourites...  
+Opens a dialog where you can view and reorder your Favourites items.  
+To reorder, select an item, then select another item where you want it to be placed.  
+Press the Close button when you're done editing (your changes won't be saved yet).  
+Press the "Reset..." button to forget your changes and start over.
+   
+### 2) Save and exit
+Saves your changes and reloads your Kodi profile (so your changes can be seen immediately, instead of you having to restart Kodi to see them).
+
+### 3) Exit only
+Just steps back from the add-on, no saving.
 
 Install it from [this zip here](https://github.com/doko-desuka/doko.repository/raw/master/plugin.program.orderfavourites/plugin.program.orderfavourites-1.1.1.zip) or from [my repository](https://github.com/dokoab/doko.repository/releases).
 
-![icon](https://github.com/doko-desuka/plugin.program.orderfavourites/raw/master/icon.png)
-
-![example](https://images2.imgbox.com/a0/04/ISjDXt4Z_o.gif)  
-(The add-on uses your actual favorites posters. Those numbered thumbs are just so you can understand what's going on.)
+PS: This add-on is archived. Feel free to fork and modify it, the code is public domain.
