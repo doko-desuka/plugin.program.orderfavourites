@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # Order Favourites program add-on for Kodi 17.6+.
 # Lets you see and reorder your Kodi favourites, to organize them.
+# In other words, this is an add-on to visually edit your
+# favourites.xml file.
 #
 # doko-desuka 2020
 # ====================================================================
@@ -110,7 +112,7 @@ class CustomFavouritesDialog(xbmcgui.WindowXMLDialog):
                 itemFrom = self.allItems.pop(self.indexFrom)
                 self.allItems.insert(selectedPosition, itemFrom)
                 self.isDirty = True
-                
+
                 # Reset the selection state.
                 self.indexFrom = None
                 itemFrom.setProperty('selected', '')
@@ -136,7 +138,7 @@ class CustomFavouritesDialog(xbmcgui.WindowXMLDialog):
     def doReload(self):
         if xbmcgui.Dialog().yesno(
             'Order Favourites',
-            'This will forget any of your changes and restore the order from before this dialog was opened.\nProceed?'
+            'This will restore the order from the favourites file so you can try reordering again.\nProceed?'
         ):
             # Re-sort all items based on their original indices.
             self.indexFrom = None
@@ -147,12 +149,12 @@ class CustomFavouritesDialog(xbmcgui.WindowXMLDialog):
 
     def _makeResult(self):
         INDENT_STRING = ' ' * 4
-        return '<favourites>\n' + '\n'.join((INDENT_STRING + li.getPath()) for li in self.allItems) + '</favourites>\n'
+        return '<favourites>\n' + '\n'.join((INDENT_STRING + li.getPath()) for li in self.allItems) + '\n</favourites>\n'
 
 
 def favouritesDataGen():
     file = xbmcvfs.File(FAVOURITES_PATH)
-    contents = file.read()
+    contents = file.read().decode('utf-8')
     file.close()
 
     namePattern = re.compile('name="([^"]+)')
@@ -189,7 +191,7 @@ def saveFavourites(xmlText):
         file.write(xmlText)
         file.close()
     except:
-        raise Exception('ERROR: unable to update the Favourites file. Nothing was saved.')    
+        raise Exception('ERROR: unable to write to the Favourites file. Nothing was saved.')
     return True
 
 
@@ -210,7 +212,7 @@ def clearWindowProperty(prop):
 
 # Debugging helper. Logs a LOGNOTICE-level message.
 def xbmcLog(*args):
-    xbmc.log('LOG > ' + ' '.join((var if isinstance(var, str) else repr(var)) for var in args), xbmc.LOGNOTICE)
+    xbmc.log('ORDER FAVOURITES > ' + ' '.join((var if isinstance(var, str) else repr(var)) for var in args), xbmc.LOGNOTICE)
 
 #===================================================================================
 
@@ -221,7 +223,9 @@ if '/dialog' in PLUGIN_URL:
     try:
         result = ui.doCustomModal(favouritesDataGen())
         setRawWindowProperty(PROPERTY_FAVOURITES_RESULT, result)
-    except:
+    except Exception as e:
+        xbmcLog(traceback.format_exc())
+        xbmcgui.Dialog().ok('Order Favourites Error', 'ERROR: "%s"\n(Please check the log for more info)' % str(e))
         clearWindowProperty(PROPERTY_FAVOURITES_RESULT)
     finally:
         del ui # Delete the dialog instance after it's done, as it's not garbage collected.
@@ -243,8 +247,8 @@ elif '/save_reload' in PLUGIN_URL:
             #)
             #xbmc.executeJSONRPC(rpcQuery)
     except Exception as e:
-        xbmcgui.Dialog().ok('Order Favourites', str(e))
         xbmcLog(traceback.format_exc())
+        xbmcgui.Dialog().ok('Order Favourites Error', 'ERROR: "%s"\n(Please check the log for more info)' % str(e))
 
 elif '/exit_only' in PLUGIN_URL:
     # Clear the results property and go back one screen (to wherever the user came from).
