@@ -200,7 +200,7 @@
                     <onleft>200</onleft>
                     <onright>100</onright>
                     <textcolor>white</textcolor>
-                    <label>[B]Reset...[/B]</label>
+                    <label>[B]Restore...[/B]</label>
                     <align>center</align>
                     <texturefocus colordiffuse="FF12A0C7">BGWhite.png</texturefocus>
                     <texturenofocus colordiffuse="30FFFFFF">BGWhite.png</texturenofocus>
