@@ -4,7 +4,7 @@
 # In other words, this is an add-on to visually edit your
 # favourites.xml file.
 #
-# doko-desuka 2020
+# doko-desuka 2021
 # ====================================================================
 import re
 import sys
@@ -14,10 +14,12 @@ try:
     # Python 2.x
     from HTMLParser import HTMLParser
     PARSER = HTMLParser()
-except ImportError:
+    DECODE_STRING = lambda val: val.decode('utf-8')
+except ImportError as e:
     # Python 3.4+ (see https://stackoverflow.com/a/2360639)
     import html
     PARSER = html
+    DECODE_STRING = lambda val: val # Pass-through.
 
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs
 from xbmcaddon import Addon
@@ -154,7 +156,7 @@ class CustomFavouritesDialog(xbmcgui.WindowXMLDialog):
 
 def favouritesDataGen():
     file = xbmcvfs.File(FAVOURITES_PATH)
-    contents = file.read().decode('utf-8')
+    contents = DECODE_STRING(file.read())
     file.close()
 
     namePattern = re.compile('name="([^"]+)')
@@ -190,7 +192,7 @@ def saveFavourites(xmlText):
         file = xbmcvfs.File(FAVOURITES_PATH, 'w')
         file.write(xmlText)
         file.close()
-    except:
+    except Exception as e:
         raise Exception('ERROR: unable to write to the Favourites file. Nothing was saved.')
     return True
 
