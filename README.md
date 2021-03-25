@@ -1,7 +1,10 @@
 # Order Favourites (plugin.program.orderfavourites)
 ![icon](https://github.com/doko-desuka/plugin.program.orderfavourites/raw/master/icon.png)  
 ### This is a simple & lightweight program add-on that lets you quickly reorganize your Kodi favourites.  
-### Install it from [this zip here](https://github.com/doko-desuka/doko.repository/raw/master/plugin.program.orderfavourites/plugin.program.orderfavourites-1.2.0.zip) or from [my repository](https://github.com/doko-desuka/doko.repository/releases).
+### Install it from these zips...  
+### (Kodi Krypton/Leia) [plugin.program.orderfavourites-1.2.0.zip](https://github.com/doko-desuka/doko.repository/raw/master/plugin.program.orderfavourites/plugin.program.orderfavourites-1.2.0.zip)
+### (Kodi Matrix) [plugin.program.orderfavourites-1.2.1+matrix.1.zip](https://github.com/doko-desuka/plugin.program.orderfavourites/raw/matrix-1-experimental/plugin.program.orderfavourites-1.2.1%2Bmatrix.1.zip)
+
 
 ----
 The main menu shows 3 options:
