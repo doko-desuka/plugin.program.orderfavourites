@@ -41,5 +41,8 @@ Lets you reorder the entries in your Favourites.
 Use this to organize your Favourites.
     </description>
     <platform>all</platform>
+    <assets>
+      <icon>icon.png</icon>
+    </assets>
   </extension>
 </addon>
