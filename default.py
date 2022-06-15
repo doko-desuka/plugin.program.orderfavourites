@@ -4,7 +4,7 @@
 # In other words, this is an add-on to visually edit your
 # favourites.xml file.
 #
-# doko-desuka 2020
+# doko-desuka 2022
 # ====================================================================
 import re
 import sys
