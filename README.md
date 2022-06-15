@@ -15,10 +15,13 @@ To reorder, select an item, then select another item where you want it to be pla
 Press the Close button when you're done editing (your changes won't be saved yet).  
 Press the "Restore..." button to restore the order from the favourites file so you can try reordering again.
    
-### 2) Save and exit
-Saves your changes and reloads your Kodi profile (so your changes can be seen immediately, instead of you having to restart Kodi to see them).
+### 2) Save and reload
+Saves your changes and reloads your Kodi profile, so your changes can be seen immediately instead of you having to restart Kodi to see them.
+   
+### 3) Save and exit
+Saves your changes but doesn't reload Kodi (as this operation can crash in some Kodi builds). After using this, you have to manually restart Kodi to see your changes.
 
-### 3) Exit only
+### 4) Exit only
 Just steps back from the add-on, no saving.
 
 PS: This add-on is archived. Feel free to fork and modify it, the code is public domain.
