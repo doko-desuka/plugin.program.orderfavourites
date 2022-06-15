@@ -233,12 +233,9 @@ if '/dialog' in PLUGIN_URL:
 elif '/save_reload' in PLUGIN_URL:
     # Reload the current profile (which causes a reload of 'favourites.xml').
     try:
-        if not saveFavourites(getRawWindowProperty(PROPERTY_FAVOURITES_RESULT)):
-            # Nothing to save, so just "exit" (go back from) the add-on.
-            xbmc.executebuiltin('Action(Back)')
-        else:
+        if saveFavourites(getRawWindowProperty(PROPERTY_FAVOURITES_RESULT)):
             clearWindowProperty(PROPERTY_FAVOURITES_RESULT)
-            xbmcgui.Dialog().ok('Order Favourites', 'Save successful, press OK to continue...')
+            xbmcgui.Dialog().ok('Order Favourites', 'Save successful, press OK to reload your profile...')
             xbmc.executebuiltin('LoadProfile(%s)' % xbmc.getInfoLabel('System.ProfileName'))
             # Alternative way of issuing a profile reload, using JSON-RPC:
             #rpcQuery = (
@@ -246,6 +243,20 @@ elif '/save_reload' in PLUGIN_URL:
             #    % xbmc.getInfoLabel('System.ProfileName')
             #)
             #xbmc.executeJSONRPC(rpcQuery)
+        else:
+            # Nothing to save, so just "exit" (go back from) the add-on.
+            xbmc.executebuiltin('Action(Back)')
+    except Exception as e:
+        xbmcLog(traceback.format_exc())
+        xbmcgui.Dialog().ok('Order Favourites Error', 'ERROR: "%s"\n(Please check the log for more info)' % str(e))
+        
+elif '/save_exit' in PLUGIN_URL:
+    # Reload the current profile (which causes a reload of 'favourites.xml').
+    try:
+        if saveFavourites(getRawWindowProperty(PROPERTY_FAVOURITES_RESULT)):
+            clearWindowProperty(PROPERTY_FAVOURITES_RESULT)
+            xbmcgui.Dialog().ok('Order Favourites', 'Save successful. Press OK to end the add-on...')
+        xbmc.executebuiltin('Action(Back)')
     except Exception as e:
         xbmcLog(traceback.format_exc())
         xbmcgui.Dialog().ok('Order Favourites Error', 'ERROR: "%s"\n(Please check the log for more info)' % str(e))
@@ -264,10 +275,16 @@ else:
     dialogItem = xbmcgui.ListItem('[COLOR lavender][B]Order favourites...[/B][/COLOR]')
     dialogItem.setArt({'thumb': 'DefaultAddonContextItem.png'})
     dialogItem.setInfo('video', {'plot': 'Open the dialog where you can order your favourites.'})
+    saveReloadItem = xbmcgui.ListItem('[COLOR lavender][B]Save and Reload[/B][/COLOR]')
+    saveReloadItem.setArt({'thumb': 'DefaultAddonsUpdates.png'})
+    saveReloadItem.setInfo('video', {'plot': 'Save any changes you made and reload your Kodi profile '
+                                       'to make the changes visible right now, without having to restart Kodi.'})
     saveExitItem = xbmcgui.ListItem('[COLOR lavender][B]Save and exit[/B][/COLOR]')
-    saveExitItem.setArt({'thumb': 'DefaultAddonsUpdates.png'})
-    saveExitItem.setInfo('video', {'plot': 'Save any changes you made, and reload your Kodi profile '
-                                       'to make the changes visible without having to restart Kodi.'})
+    saveExitItem.setArt({'thumb': 'DefaultFolderBack.png'})
+    saveExitItem.setInfo('video', {'plot': 'Save any changes you made and exit the add-on. [B]Note:[/B] if you '
+                                   'make any changes to your favourites using the Favourites screen (like adding, '
+                                   'removing or reordering items) before closing Kodi, your changes from this '
+                                   'add-on will be forgotten.'})
     exitItem = xbmcgui.ListItem('[COLOR lavender][B]Exit only[/B][/COLOR]')
     exitItem.setArt({'thumb': 'DefaultFolderBack.png'})
     exitItem.setInfo('video', {'plot': 'Exit the add-on (same as pressing Back), without saving your changes.'})
@@ -276,7 +293,8 @@ else:
         (
             # PLUGIN_URL already ends with a slash, so just append the route to it.
             (PLUGIN_URL + 'dialog', dialogItem, False),
-            (PLUGIN_URL + 'save_reload', saveExitItem, False),
+            (PLUGIN_URL + 'save_reload', saveReloadItem, False),
+            (PLUGIN_URL + 'save_exit', saveExitItem, False),
             (PLUGIN_URL + 'exit_only', exitItem, False)
         )
     )
