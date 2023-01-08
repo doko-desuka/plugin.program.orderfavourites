@@ -4,7 +4,7 @@
 # In other words, this is an add-on to visually edit your
 # favourites.xml file.
 #
-# doko-desuka 2022
+# doko-desuka 2021
 # ====================================================================
 import re
 import sys
@@ -14,10 +14,12 @@ try:
     # Python 2.x
     from HTMLParser import HTMLParser
     PARSER = HTMLParser()
-except ImportError:
+    DECODE_STRING = lambda val: val.decode('utf-8')
+except ImportError as e:
     # Python 3.4+ (see https://stackoverflow.com/a/2360639)
     import html
     PARSER = html
+    DECODE_STRING = lambda val: val # Pass-through.
 
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs
 from xbmcaddon import Addon
@@ -154,7 +156,7 @@ class CustomFavouritesDialog(xbmcgui.WindowXMLDialog):
 
 def favouritesDataGen():
     file = xbmcvfs.File(FAVOURITES_PATH)
-    contents = file.read().decode('utf-8')
+    contents = DECODE_STRING(file.read())
     file.close()
 
     namePattern = re.compile('name="([^"]+)')
@@ -190,7 +192,7 @@ def saveFavourites(xmlText):
         file = xbmcvfs.File(FAVOURITES_PATH, 'w')
         file.write(xmlText)
         file.close()
-    except:
+    except Exception as e:
         raise Exception('ERROR: unable to write to the Favourites file. Nothing was saved.')
     return True
 
@@ -233,9 +235,12 @@ if '/dialog' in PLUGIN_URL:
 elif '/save_reload' in PLUGIN_URL:
     # Reload the current profile (which causes a reload of 'favourites.xml').
     try:
-        if saveFavourites(getRawWindowProperty(PROPERTY_FAVOURITES_RESULT)):
+        if not saveFavourites(getRawWindowProperty(PROPERTY_FAVOURITES_RESULT)):
+            # Nothing to save, so just "exit" (go back from) the add-on.
+            xbmc.executebuiltin('Action(Back)')
+        else:
             clearWindowProperty(PROPERTY_FAVOURITES_RESULT)
-            xbmcgui.Dialog().ok('Order Favourites', 'Save successful, press OK to reload your profile...')
+            xbmcgui.Dialog().ok('Order Favourites', 'Save successful, press OK to continue...')
             xbmc.executebuiltin('LoadProfile(%s)' % xbmc.getInfoLabel('System.ProfileName'))
             # Alternative way of issuing a profile reload, using JSON-RPC:
             #rpcQuery = (
@@ -243,9 +248,6 @@ elif '/save_reload' in PLUGIN_URL:
             #    % xbmc.getInfoLabel('System.ProfileName')
             #)
             #xbmc.executeJSONRPC(rpcQuery)
-        else:
-            # Nothing to save, so just "exit" (go back from) the add-on.
-            xbmc.executebuiltin('Action(Back)')
     except Exception as e:
         xbmcLog(traceback.format_exc())
         xbmcgui.Dialog().ok('Order Favourites Error', 'ERROR: "%s"\n(Please check the log for more info)' % str(e))
@@ -258,7 +260,7 @@ elif '/save_exit' in PLUGIN_URL:
         xbmc.executebuiltin('Action(Back)')
     except Exception as e:
         xbmcLog(traceback.format_exc())
-        xbmcgui.Dialog().ok('Order Favourites Error', 'ERROR: "%s"\n(Please check the log for more info)' % str(e))
+        xbmcgui.Dialog().ok('Order Favourites Error', 'ERROR: "%s"\n(Please check the log for more info)' % str(e))        
 
 elif '/exit_only' in PLUGIN_URL:
     # Clear the results property and go back one screen (to wherever the user came from).
