@@ -4,19 +4,17 @@
 
 ### Install it [from the zips in the Releases page](https://github.com/doko-desuka/plugin.program.orderfavourites/releases).
 
-----
-
-### How to use:
+# How to use:
 
 The main menu shows 4 options.
 
 ### 1) Order favourites...   
 Opens a dialog where you can view and reorder your Favourites items.   
 - To reorder items, select an item to "mark" it, then select another item to move the marked item there.  
-(The marked item will be placed in the **front** of the other item.)  
+(The marked item will be placed in **front** of the other item.)  
 (If an item is marked, you can select it again to unmark it.)  
-- Press the Close button when you're done editing (your changes won't be saved yet).  
-- If you want to start over, press the "Restore..." button to restore the order from Kodi favourites file so you can try reordering again.
+- Press the Close button to close that dialog when you're done editing (your changes won't be saved yet).  
+- If you've made some mistakes and want to start over, press the "Restore..." button to restore the favourites order from the Kodi favourites file. This will undo your unsaved changes.
    
 ### 2) Save and reload
 Saves your changes and reloads your Kodi profile, so your changes can be seen immediately instead of you having to restart Kodi to see them.
