@@ -251,7 +251,6 @@ elif '/save_reload' in PLUGIN_URL:
         xbmcgui.Dialog().ok('Order Favourites Error', 'ERROR: "%s"\n(Please check the log for more info)' % str(e))
         
 elif '/save_exit' in PLUGIN_URL:
-    # Reload the current profile (which causes a reload of 'favourites.xml').
     try:
         if saveFavourites(getRawWindowProperty(PROPERTY_FAVOURITES_RESULT)):
             clearWindowProperty(PROPERTY_FAVOURITES_RESULT)
