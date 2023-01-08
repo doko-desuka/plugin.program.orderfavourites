@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.program.orderfavourites" name="Order Favourites" version="1.2.1" provider-name="doko">
+<addon id="plugin.program.orderfavourites" name="Order Favourites" version="1.2.2" provider-name="doko">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
   </requires>
@@ -9,7 +9,12 @@
   <extension point="xbmc.addon.metadata">
     <news>
 [COLOR lavender][B]Order Favourites[/B][/COLOR]
+[B]1.2.2:[/B]
+- Ported the improvements from the Leia version to the Matrix version.
+
 [B]1.2.1:[/B]
+- Renamed "Save and exit" to "Save and reload", makes it clearer.
+- Added "Save and exit". Use this when save + reload happens to crash your Kodi. After saving, restart Kodi manually to see the changes.
 - Experimental Matrix version now available.
 
 [B]1.2.0:[/B]
@@ -41,8 +46,5 @@ Lets you reorder the entries in your Favourites.
 Use this to organize your Favourites.
     </description>
     <platform>all</platform>
-    <assets>
-      <icon>icon.png</icon>
-    </assets>
   </extension>
 </addon>
