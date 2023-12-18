@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.program.orderfavourites" name="Order Favourites" version="1.3.0" provider-name="doko">
   <requires>
-    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="xbmc.python" version="2.20.0"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="default.py">
     <provides>executable</provides>
@@ -13,17 +13,10 @@
 - Changed the movement method to "Swap item A and B". The old method used to be
 "Remove A and re-insert it around B", confusing and disruptive.
 
-[B]1.2.3:[/B]
-- Add-on metadata update with an icon fix.
-
-[B]1.2.2:[/B]
-- Ported the improvements from the Leia version to the Matrix version.
-
 [B]1.2.1:[/B]
 - Renamed "Save and exit" to "Save and reload", makes it clearer.
 - Added "Save and exit". Use this when save + reload happens to crash your Kodi. After saving, restart Kodi manually to see the changes.
-- Experimental Matrix version now available.
-
+      
 [B]1.2.0:[/B]
 - Fixed a case when the add-on failed to read the favourites file because of Unicode strings.
 (Thanks to [I]msauers[/I] for the report.)
@@ -54,7 +47,7 @@ Use this to organize your Favourites.
     </description>
     <platform>all</platform>
     <assets>
-        <icon>icon.png</icon>
+      <icon>icon.png</icon>
     </assets>
   </extension>
 </addon>
