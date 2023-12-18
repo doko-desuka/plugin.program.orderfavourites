@@ -10,7 +10,7 @@ The main menu shows 4 options.
 
 ### 1) Order favourites...   
 Opens a dialog where you can view and reorder your Favourites items.   
-- To reorder items, select an item to "mark" it, then select another item to **swap their place**.
+- To reorder items, select an item to "mark" it, then select another item to **swap their place**.  
 (If an item is marked, you can select it again to unmark it.)  
 - Press the Close button to close that dialog when you're done editing. Your changes won't be saved yet.
 - If you've made some mistakes and want to start over, press the "Restore..." button to restore the favourites order from the Kodi favourites file, or also close the dialog and re-open it. This will undo your unsaved changes.
