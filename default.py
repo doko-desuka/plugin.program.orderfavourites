@@ -4,7 +4,7 @@
 # In other words, this is an add-on to visually edit your
 # favourites.xml file.
 #
-# doko-desuka 2021
+# doko-desuka 2023
 # ====================================================================
 import re
 import sys
@@ -64,25 +64,31 @@ class CustomFavouritesDialog(xbmcgui.WindowXMLDialog):
         self.noop = lambda: None
 
 
-    # Function used to start the dialog.
-    def doCustomModal(self, favouritesGen):
-        allItems = [ ]
+    @staticmethod
+    def _makeFavourites(favouritesGen):
+        LISTITEM = xbmcgui.ListItem
         artDict = {'thumb': None}
         for index, data in enumerate(favouritesGen):
             # The path of each ListItem contains the original favourite entry XML text (with the label, thumb and URL)
             # and this is what's written to the favourites file upon saving -- what changes is the order of the items.
-            li = xbmcgui.ListItem(data[0], path=data[2])
+            li = LISTITEM(data[0], path=data[2])
             artDict['thumb'] = data[1] # Slightly faster than recreating a dict on every item.
             li.setArt(artDict)
             li.setProperty('index', str(index)) # To help with resetting, if necessary.
-            allItems.append(li)
+            yield li
 
-        self.allItems = allItems
+
+    # Function used to start the dialog.
+    def doCustomModal(self, favouritesGen):
+        self.allItems = list(self._makeFavourites(favouritesGen))
         self.indexFrom = None # Integer index of the source item (or None when nothing is selected).
         self.isDirty = False # Bool saying if there were any user-made changes at all.
 
         self.doModal()
-        return self._makeResult() if self.isDirty else ''
+        if self.isDirty:
+            return self._makeResult()
+        else:
+            return ''
 
 
     # Automatically called before the dialog is shown. The UI controls exist now.
@@ -110,16 +116,23 @@ class CustomFavouritesDialog(xbmcgui.WindowXMLDialog):
         else:
             # Something was already selected, so do the reodering.
             if self.indexFrom != selectedPosition:
+                # OLD METHOD:
                 # Reorder using the .pop() and .insert() methods of the 'self.allItems' list.
-                itemFrom = self.allItems.pop(self.indexFrom)
-                self.allItems.insert(selectedPosition, itemFrom)
-                self.isDirty = True
+                #itemFrom = self.allItems.pop(self.indexFrom)
+                #self.allItems.insert(selectedPosition, itemFrom)
+
+                # NEW METHOD:
+                # Swap item A and item B.
+                self.allItems[self.indexFrom], self.allItems[selectedPosition] = (
+                    self.allItems[selectedPosition], self.allItems[self.indexFrom]
+                )
 
                 # Reset the selection state.
+                self.isDirty = True
                 self.indexFrom = None
-                itemFrom.setProperty('selected', '')
+                self.allItems[selectedPosition].setProperty('selected', '')
 
-                # Update the panel by clearing it and readding all the items.
+                # Commit the changes to the UI.
                 self.panel.reset()
                 self.panel.addItems(self.allItems)
                 self.panel.selectItem(selectedPosition)
@@ -143,10 +156,13 @@ class CustomFavouritesDialog(xbmcgui.WindowXMLDialog):
             'This will restore the order from the favourites file so you can try reordering again.\nProceed?'
         ):
             # Re-sort all items based on their original indices.
+            selectedPosition = self.panel.getSelectedPosition()
             self.indexFrom = None
             self.allItems = sorted(self.allItems, key=lambda li: int(li.getProperty('index')))
             self.panel.reset()
             self.panel.addItems(self.allItems)
+            if selectedPosition != -1:
+                self.panel.selectItem(selectedPosition)
 
 
     def _makeResult(self):
@@ -159,10 +175,10 @@ def favouritesDataGen():
     contents = DECODE_STRING(file.read())
     file.close()
 
-    namePattern = re.compile('name="([^"]+)')
-    thumbPattern = re.compile('thumb="([^"]+)')
+    namePattern = re.compile('name\s*=\s*"([^"]+)')
+    thumbPattern = re.compile('thumb\s*=\s*"([^"]+)')
 
-    for entryMatch in re.finditer('(<favourite\s[^<]+</favourite>)', contents):
+    for entryMatch in re.finditer('(<favourite\s+[^<]+</favourite>)', contents):
         entry = entryMatch.group(1)
 
         match = namePattern.search(entry)
@@ -235,12 +251,9 @@ if '/dialog' in PLUGIN_URL:
 elif '/save_reload' in PLUGIN_URL:
     # Reload the current profile (which causes a reload of 'favourites.xml').
     try:
-        if not saveFavourites(getRawWindowProperty(PROPERTY_FAVOURITES_RESULT)):
-            # Nothing to save, so just "exit" (go back from) the add-on.
-            xbmc.executebuiltin('Action(Back)')
-        else:
+        if saveFavourites(getRawWindowProperty(PROPERTY_FAVOURITES_RESULT)):
             clearWindowProperty(PROPERTY_FAVOURITES_RESULT)
-            xbmcgui.Dialog().ok('Order Favourites', 'Save successful, press OK to continue...')
+            xbmcgui.Dialog().ok('Order Favourites', 'Save successful, press OK to reload your profile...')
             xbmc.executebuiltin('LoadProfile(%s)' % xbmc.getInfoLabel('System.ProfileName'))
             # Alternative way of issuing a profile reload, using JSON-RPC:
             #rpcQuery = (
@@ -248,11 +261,15 @@ elif '/save_reload' in PLUGIN_URL:
             #    % xbmc.getInfoLabel('System.ProfileName')
             #)
             #xbmc.executeJSONRPC(rpcQuery)
+        else:
+            # Nothing to save, so just "exit" (go back from) the add-on.
+            xbmc.executebuiltin('Action(Back)')
     except Exception as e:
         xbmcLog(traceback.format_exc())
         xbmcgui.Dialog().ok('Order Favourites Error', 'ERROR: "%s"\n(Please check the log for more info)' % str(e))
-        
+
 elif '/save_exit' in PLUGIN_URL:
+    # Reload the current profile (which causes a reload of 'favourites.xml').
     try:
         if saveFavourites(getRawWindowProperty(PROPERTY_FAVOURITES_RESULT)):
             clearWindowProperty(PROPERTY_FAVOURITES_RESULT)
@@ -260,7 +277,7 @@ elif '/save_exit' in PLUGIN_URL:
         xbmc.executebuiltin('Action(Back)')
     except Exception as e:
         xbmcLog(traceback.format_exc())
-        xbmcgui.Dialog().ok('Order Favourites Error', 'ERROR: "%s"\n(Please check the log for more info)' % str(e))        
+        xbmcgui.Dialog().ok('Order Favourites Error', 'ERROR: "%s"\n(Please check the log for more info)' % str(e))
 
 elif '/exit_only' in PLUGIN_URL:
     # Clear the results property and go back one screen (to wherever the user came from).
@@ -275,7 +292,10 @@ else:
 
     dialogItem = xbmcgui.ListItem('[COLOR lavender][B]Order favourites...[/B][/COLOR]')
     dialogItem.setArt({'thumb': 'DefaultAddonContextItem.png'})
-    dialogItem.setInfo('video', {'plot': 'Open the dialog where you can order your favourites.'})
+    dialogItem.setInfo('video', {'plot': 'Open the dialog where you can order your favourites.[CR][B]How to ' \
+                                 'use:[/B] select one item, then select another to swap their place. ' \
+                                 'Do this as much as needed. Finally, close the dialog and use the menus ' \
+                                 'below to save your changes.'})
     saveReloadItem = xbmcgui.ListItem('[COLOR lavender][B]Save and Reload[/B][/COLOR]')
     saveReloadItem.setArt({'thumb': 'DefaultAddonsUpdates.png'})
     saveReloadItem.setInfo('video', {'plot': 'Save any changes you made and reload your Kodi profile '
