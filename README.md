@@ -2,7 +2,17 @@
 ![icon](https://github.com/doko-desuka/plugin.program.orderfavourites/raw/master/icon.png)  
 ### This is a simple & lightweight program add-on that lets you quickly reorganize your Kodi favourites.  
 
-### Install it [from the zips in the Releases page](https://github.com/doko-desuka/plugin.program.orderfavourites/releases).
+# How to install:
+
+There are two ways:
+
+A) [From the zips in the Releases page](https://github.com/doko-desuka/plugin.program.orderfavourites/releases).
+
+B) To install from a URL, do this:  
+> Go to Settings > File Manager > Add source, use the link https://doko-desuka.github.io/ and give it a name.  
+> After that, go to Add-ons > \*Add-ons browser (the open box icon on the top-left, Estuary skin) > Install from zip file > select that named source > see the zips for this add-on for either Leia or Matrix+. Select a zip to install it.  
+>  
+> \* You can also access the Add-ons browser by going to Settings > Add-ons.
 
 # Main menus & how to use:
 
