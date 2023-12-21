@@ -4,9 +4,7 @@
 
 ### Install it [from the zips in the Releases page](https://github.com/doko-desuka/plugin.program.orderfavourites/releases).
 
-# How to use:
-
-The main menu shows 4 options.
+# Main menus & how to use:
 
 ### 1) Order favourites...   
 Opens a dialog where you can view and reorder your Favourites items.   
