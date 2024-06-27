@@ -16,7 +16,8 @@ B) To install from a URL, do this:
 
 # Main menus & how to use:
 
-While using the add-on, all main menus have descriptions on what they do, and the main dialog has a button titled "How to use..." with instructions on how to use it.
+While using the add-on, all main menus have descriptions on what they do, and the main dialog has a button titled "How to use..." with instructions on how to use it.  
+There's also the Kodi forum thread: https://forum.kodi.tv/showthread.php?tid=351844
 
 # How to Backup your Favourites File
 
