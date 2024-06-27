@@ -29,7 +29,7 @@ You can simply go to Kodi's userdata folders ([in these locations](https://kodi.
 
 ### Mobile Platforms (Android, Apple etc)
 
-You need to do it in a few steps, as there are permission issues with accessing an app's files. You do not need to root your device.  
+You need to do it in a few steps, as there are permission issues with accessing an app's files. You don't have to root your device to do this.  
 - On Kodi, go to **Settings > File Manager**. The File Manager is a screen with two sides, left and right.
 - On the left side, enter the **Profile Directory** folder to find your Kodi userdata files and folders, among which `favourites.xml`.  
 - On the right side, go to **Add Source > Browse**, and navigate to some folder of your device that you know you can access. On Android, a good choice is the **Internal Storage/sdcard/Download** folder for example (see asterisk at the bottom), which is visible to all apps. Confirm to add the new source with that location on the right side of the screen and **enter it** so you're viewing the inside of that location.  
