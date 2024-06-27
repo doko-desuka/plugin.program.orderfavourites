@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>    
+<?xml version="1.0" encoding="utf-8"?>
 <window>
-    <defaulcontrol>100</defaulcontrol>
+    <defaultcontrol>100</defaultcontrol>
 	<controls>
         <control type="group">
 			<centertop>50%</centertop>
 			<centerleft>50%</centerleft>
 			<width>1510</width>
             <height>960</height>
-        
+
             <!-- Mostly copied from the Estuary skin XMLs. -->
             <control type="image">
                 <!-- Background underlay. -->
@@ -70,7 +70,7 @@
                     <onclick>noop</onclick>
                 </control>
             </control>
-            
+
             <!-- Panel with the content. -->
             <control type="group" id="100">
                 <control type="panel" id="101">
@@ -87,7 +87,7 @@
                     <pagecontrol>200</pagecontrol>
                     <scrolltime tween="sine">200</scrolltime>
                     <orientation>vertical</orientation>
-                    
+
                     <!-- Content of normal ListItem elements. -->
                     <itemlayout width="290" height="390">
                         <control type="image">
@@ -164,10 +164,10 @@
                             <texture colordiffuse="8010C0CF">BGWhite.png</texture>
                             <bordersize>10</bordersize>
                         </control>
-                    </focusedlayout>                     
+                    </focusedlayout>
                 </control>
             </control>
-            
+
             <!-- Sidebar body. -->
             <control type="image">
                 <top>70</top>
@@ -176,7 +176,7 @@
                 <width>310</width>
                 <texture colordiffuse="FF313839">BGWhite.png</texture>
             </control>
-            
+
             <!-- Scrollbar for the content. -->
             <control type="scrollbar" id="200">
 				<top>70</top>
@@ -195,14 +195,16 @@
 				<onright>301</onright>
 				<orientation>vertical</orientation>
 			</control>
-            
+
             <!-- Buttons. -->
             <control type="grouplist">
                 <right>20</right>
                 <width>270</width>
 				<top>90</top>
-                <bottom>0</bottom>
+                <bottom>250</bottom>
 				<itemgap>50</itemgap>
+                <onup>304</onup>
+                <ondown>303</ondown>
                 <control type="button" id="301">
                     <width>270</width>
                     <height>100</height>
@@ -225,7 +227,51 @@
                     <texturefocus colordiffuse="FF12A0C7">BGWhite.png</texturefocus>
                     <texturenofocus colordiffuse="30FFFFFF">BGWhite.png</texturenofocus>
                 </control>
-			</control>
+            </control>
+            <control type="label">
+                <width>270</width>
+                <height>70</height>
+                <right>20</right>
+                <!-- TOP = 90 + 100 + 50 + 100 + 100 -->
+                <top>440</top>
+                <aligny>center</aligny>
+                <label>[B]Current Mode:[/B]</label>
+            </control>
+            <control type="grouplist">
+                <right>20</right>
+                <width>270</width>
+				<top>510</top>
+                <bottom>0</bottom>
+				<itemgap>170</itemgap>
+                <onup>302</onup>
+                <ondown>301</ondown>
+                <control type="button" id="303">
+                    <width>270</width>
+                    <height>100</height>
+                    <onleft>200</onleft>
+                    <onright>100</onright>
+                    <onup>302</onup>
+                    <ondown>301</ondown>
+                    <textcolor>white</textcolor>
+                    <label>[B]$INFO[Window(Programs).Property(ordfav.mode)][/B]</label>
+                    <align>center</align>
+                    <texturefocus colordiffuse="FF12A0C7">BGWhite.png</texturefocus>
+                    <texturenofocus colordiffuse="30FFFFFF">BGWhite.png</texturenofocus>
+                </control>
+                <control type="button" id="304">
+                    <width>270</width>
+                    <height>100</height>
+                    <top>490</top>
+                    <right>20</right>
+                    <onleft>200</onleft>
+                    <onright>100</onright>
+                    <textcolor>white</textcolor>
+                    <label>[B]How to use...[/B]</label>
+                    <align>center</align>
+                    <texturefocus colordiffuse="FF12A0C7">BGWhite.png</texturefocus>
+                    <texturenofocus colordiffuse="30FFFFFF">BGWhite.png</texturenofocus>
+                </control>
+            </control>
 		</control>
 	</controls>
 </window>
